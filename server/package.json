@@ -1,0 +1,48 @@
+{
+  "name": "figma-mcp-free",
+  "version": "0.2.0",
+  "description": "MCP server that bridges Figma plugin data to AI tools without hitting API rate limits",
+  "type": "module",
+  "bin": {
+    "figma-mcp-free": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "bun run build"
+  },
+  "keywords": [
+    "figma",
+    "mcp",
+    "model-context-protocol",
+    "ai",
+    "design"
+  ],
+  "author": "karthik yaddanapudi",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slashdoodleart/figma-mcp-free.git",
+    "directory": "server"
+  },
+  "homepage": "https://github.com/slashdoodleart/figma-mcp-free#readme",
+  "bugs": {
+    "url": "https://github.com/slashdoodleart/figma-mcp-free/issues"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "ws": "^8.18.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/ws": "^8.5.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

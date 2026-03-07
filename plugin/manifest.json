@@ -1,0 +1,14 @@
+{
+  "name": "Figma MCP Free",
+  "id": "figma-mcp-free",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/index.html",
+  "permissions": [],
+  "networkAccess": {
+    "allowedDomains": ["ws://localhost:1994"],
+    "reasoning": "Connects to local MCP server via WebSocket to stream Figma document data to AI tools"
+  },
+  "documentAccess": "dynamic-page",
+  "editorType": ["figma", "dev"]
+}

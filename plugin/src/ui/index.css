@@ -1,0 +1,48 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  background: #0f1115;
+  color: #e5e7eb;
+}
+
+.container {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.status {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #1f2937;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.status-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-badge.connected {
+  background: #064e3b;
+  color: #a7f3d0;
+}
+
+.status-badge.disconnected {
+  background: #7f1d1d;
+  color: #fecaca;
+}
+
+.meta {
+  font-size: 13px;
+  color: #9ca3af;
+}

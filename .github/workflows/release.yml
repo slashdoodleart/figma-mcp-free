@@ -1,0 +1,105 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version (semantic, e.g., 1.0.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  id-token: write # Required for npm provenance (trusted publishing)
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate version format
+        run: |
+          if ! echo "${{ inputs.version }}" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?(\+[a-zA-Z0-9.]+)?$'; then
+            echo "Error: Version must be semantic (e.g., 1.0.0, 1.0.0-beta.1)"
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # ── Server: install, build, publish ──────────────────────────────
+
+      - name: Install server dependencies
+        working-directory: server
+        run: bun install --frozen-lockfile
+
+      - name: Transpile server (tsc)
+        working-directory: server
+        run: bun run build
+
+      - name: Verify CLI entry point
+        working-directory: server
+        run: |
+          # Ensure the shebang is present for npx compatibility
+          head -1 dist/index.js | grep -q '#!/usr/bin/env node' \
+            || { echo "ERROR: dist/index.js is missing the node shebang"; exit 1; }
+          echo "✓ Shebang present in dist/index.js"
+
+      - name: Bundle README for npm
+        run: cp README.md server/README.md
+
+      - name: Set package version
+        working-directory: server
+        run: npm version ${{ inputs.version }} --no-git-tag-version
+
+      - name: Publish to npm (with provenance)
+        working-directory: server
+        run: npm publish --access public --provenance
+        # env:
+        #   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # ── Figma plugin: install, build ─────────────────────────────────
+
+      - name: Install plugin dependencies
+        working-directory: plugin
+        run: bun install --frozen-lockfile
+
+      - name: Build Figma plugin
+        working-directory: plugin
+        run: bun run build
+
+      # ── Package GitHub release ───────────────────────────────────────
+
+      - name: Package release
+        run: |
+          mkdir -p release/plugin
+
+          # Copy built Figma plugin
+          cp -r plugin/dist release/plugin/
+          cp plugin/manifest.json release/plugin/
+
+          # Copy other repo files
+          cp README.md release/
+          cp LICENSE.md release/
+
+          # Create zip
+          cd release
+          zip -r ../figma-mcp-free-v${{ inputs.version }}.zip .
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ inputs.version }}
+          name: Release v${{ inputs.version }}
+          generate_release_notes: true
+          files: figma-mcp-free-v${{ inputs.version }}.zip
