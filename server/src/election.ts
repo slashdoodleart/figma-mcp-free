@@ -16,7 +16,9 @@ export class Election {
     private port: number,
     private node: Node
   ) {
-    this.leaderUrl = `http://localhost:${port}`;
+    const useHttps = process.env.HTTPS === "true" || !!process.env.SSL_KEY_FILE || !!process.env.SSL_KEY_PATH || !!process.env.SSL_KEY;
+    const protocol = useHttps ? "https" : "http";
+    this.leaderUrl = `${protocol}://localhost:${port}`;
   }
 
   async start(): Promise<void> {

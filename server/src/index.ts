@@ -7,9 +7,14 @@ import { Election } from "./election.js";
 import { registerTools } from "./tools.js";
 import { VERSION } from "./version.js";
 
-const PORT = 1994;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 1994;
 
 async function main(): Promise<void> {
+  const useHttps = process.env.HTTPS === "true" || !!process.env.SSL_KEY_FILE || !!process.env.SSL_KEY_PATH || !!process.env.SSL_KEY;
+  if (useHttps) {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+  }
+
   const node = new Node(PORT);
   const election = new Election(PORT, node);
   await election.start();

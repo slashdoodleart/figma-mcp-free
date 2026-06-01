@@ -46,3 +46,37 @@ body {
   font-size: 13px;
   color: #9ca3af;
 }
+
+.settings {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: #1f2937;
+  display: flex;
+  align-items: center;
+  border: 1px solid #374151;
+  transition: border-color 0.2s ease;
+}
+
+.settings:hover {
+  border-color: #4b5563;
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 13px;
+  color: #d1d5db;
+  width: 100%;
+}
+
+.toggle-container input {
+  cursor: pointer;
+  accent-color: #3b82f6;
+}
+
+.toggle-label {
+  flex-grow: 1;
+}
