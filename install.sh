@@ -144,12 +144,12 @@ SKIPPED=()
 configure_tool() {
   local name="$1"
   local cfg_path="$2"
-  local always="${3:-false}"  # if true, configure even if app not detected
+  local always="${3:-false}"
 
   if [[ "$always" == "true" ]] || [[ -f "$cfg_path" ]] || [[ -d "$(dirname "$cfg_path")" ]]; then
-    info "Configuring $name…"
+    info "Configuring $name..."
     inject_mcp_config "$cfg_path" "$SERVER_JSON"
-    success "$name configured → $cfg_path"
+    success "$name configured -> $cfg_path"
     INSTALLED+=("$name")
   else
     SKIPPED+=("$name (not detected)")

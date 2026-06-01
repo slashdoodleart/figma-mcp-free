@@ -13,7 +13,9 @@ export class Node {
   private follower: Follower;
 
   constructor(private port: number) {
-    this.follower = new Follower(`http://localhost:${port}`);
+    const useHttps = process.env.HTTPS === "true" || !!process.env.SSL_KEY_FILE || !!process.env.SSL_KEY_PATH || !!process.env.SSL_KEY;
+    const protocol = useHttps ? "https" : "http";
+    this.follower = new Follower(`${protocol}://localhost:${port}`);
   }
 
   get role(): Role {
@@ -54,7 +56,7 @@ export class Node {
   async becomeLeader(): Promise<void> {
     if (this._role === Role.Leader) return;
 
-    const leader = new Leader(this.port);
+    const leader = new Leader(this.port, this);
     await leader.start();
 
     this.leader = leader;

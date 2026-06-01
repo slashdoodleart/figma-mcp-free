@@ -32,14 +32,31 @@ type PluginStatus = {
   fileName: string;
   selectionCount: number;
 };
+const getSafeLocalStorage = (key: string): string | null => {
+  try {
+    return localStorage.getItem(key);
+  } catch (e) {
+    console.warn("localStorage is not accessible:", e);
+    return null;
+  }
+};
 
-const WS_URL = "ws://localhost:1994/ws";
+const setSafeLocalStorage = (key: string, value: string): void => {
+  try {
+    localStorage.setItem(key, value);
+  } catch (e) {
+    console.warn("localStorage is not accessible:", e);
+  }
+};
 
 export default function App() {
   const [connected, setConnected] = useState(false);
   const [status, setStatus] = useState<PluginStatus>({
     fileName: "Unknown file",
     selectionCount: 0
+  });
+  const [useWss, setUseWss] = useState<boolean>(() => {
+    return getSafeLocalStorage("figma-bridge-use-wss") === "true";
   });
   const socketRef = useRef<WebSocket | null>(null);
   const reconnectTimer = useRef<number | null>(null);
@@ -81,7 +98,8 @@ export default function App() {
         socketRef.current.close();
       }
 
-      const ws = new WebSocket(WS_URL);
+      const wsUrl = useWss ? "wss://localhost:1994/ws" : "ws://localhost:1994/ws";
+      const ws = new WebSocket(wsUrl);
       socketRef.current = ws;
 
       ws.onopen = () => {
@@ -119,9 +137,7 @@ export default function App() {
         socketRef.current.close();
       }
     };
-  }, []);
-
-  
+  }, [useWss]);
 
   return (
     <div className="container">
@@ -135,6 +151,22 @@ export default function App() {
           {statusLabel}
         </span>
       </div>
+
+      <div className="settings">
+        <label className="toggle-container">
+          <input
+            type="checkbox"
+            checked={useWss}
+            onChange={(e) => {
+              const checked = e.target.checked;
+              setUseWss(checked);
+              setSafeLocalStorage("figma-bridge-use-wss", String(checked));
+            }}
+          />
+          <span className="toggle-label">Use Secure Connection (WSS)</span>
+        </label>
+      </div>
+
       <div className="meta">File: {status.fileName}</div>
       <div className="meta">Selection: {status.selectionCount} node(s)</div>
     </div>
